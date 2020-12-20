@@ -5,20 +5,27 @@ using namespace std;
 
 class NODE {
 private:
+	int line_number;
 	string data;
 	NODE* next;
 
 public:
-	NODE() : data(""), next(NULL) {}
-	NODE(string data) : data(data), next(NULL) {}
+	NODE() : line_number(0), data(""), next(NULL) {}
+	NODE(int line, string data) : line_number(line), data(data), next(NULL) {}
 
 	void setData(string data) {
 		data = data;
+	}
+	void setData(int data) {
+		line_number = data;
 	}
 	void setNext(NODE* ptr) {
 		next = ptr;
 	}
 
+	int getLine() {
+		return line_number;
+	}
 	string getData() {
 		return data;
 	}
@@ -50,27 +57,25 @@ public:
 		return (top == NULL ? true : false);
 	}
 
-	void push(string data) {
-		NODE* tmp = new NODE(data);
+	void push(string data, int line) {
+		NODE* tmp = new NODE(line, data);
 		if (isEmpty()) {
 			tmp->next = NULL;
 		}
 		else {
 			tmp->next = this->top;
 		}
+		this->top = tmp;
 	}
 
-	string pop() {
+	NODE* pop() {
 		if (isEmpty()) {
-			return "";
+			return NULL;
 		}
 		else {
-			string rtval;
 			NODE* tmp = this->top;
 			this->top = tmp->next;
-			rtval = tmp->data;
-			delete tmp;
-			return rtval;
+			return tmp;
 		}
 	}
 };

@@ -42,6 +42,9 @@ public:
 				}
 			}
 		}
+		if (tocheck == tosearch) {
+			return true;
+		}
 		return false;
 	}
 	bool exists(string str, char tosearch) {                      // Overloaded Constructors
