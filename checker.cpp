@@ -56,8 +56,8 @@ public:
 			this->lines
 		);  // A Syntax Class Instance
 		
-		// Calling on Syntax Engage Method
-		syntax->engage();
+		// Parsing the provided File
+		syntax->parser();
 	}
 };
 

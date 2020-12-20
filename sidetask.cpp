@@ -3,14 +3,37 @@
 
 using namespace std;
 
+/*
+	This class is inhertted by syntax class
+	and manages all the extra functions
+	which would be used more and more
+	all over the class
+*/
+
 class SIDETASK {
 private:
 	const string WHITESPACE = " \n\r\t\f\v";           // Constant for checking with white spaces
 
 public:
-	void halt(string _val) {
-		cout << _val << endl;
-		cout << "||  ";
+	void halt(int line, string exception, string error) {
+		cout << "~~  Error Encountered" << endl;
+		cout << "~~  Line Number: " << line << endl;
+		cout << "~~  Exception: " << exception << endl;
+		cout << "~~  Error: " << error << endl << endl;
+
+		cout << "##  ";
+		system("pause");
+		exit(-1);
+	}
+
+	void halt(int line1, int line2, string exception, string sequence, string error) {
+		cout << "~~  Error Encountered" << endl;
+		cout << "~~  Line Numbers: " << line1 << ", " << line2 << endl;
+		cout << "~~  Exception: " << exception << endl;
+		cout << "~~  Sequence: " << sequence << endl;
+		cout << "~~  Error: " << error << endl << endl;
+
+		cout << "##  ";
 		system("pause");
 		exit(-1);
 	}
@@ -24,37 +47,5 @@ public:
 	string rtrim(const string s){         // Removing Right Spaces
 		size_t end = s.find_last_not_of(WHITESPACE);
 		return (end == string::npos) ? "" : s.substr(0, end + 1);
-	}
-
-	bool startswith(string str, string tosearch) {
-		
-	}
-
-	bool exists(string str, string tosearch) {                      // Check Existence
-		string tocheck = "";
-		for (int i = 0; i < str.length(); i++) {
-			if (isalpha(str[i])) {
-				tocheck += str[i];
-			}
-			else {
-				if (tocheck == tosearch) {
-					return true;
-				}
-			}
-		}
-		if (tocheck == tosearch) {
-			return true;
-		}
-		return false;
-	}
-	bool exists(string str, char tosearch) {                      // Overloaded Constructors
-		if (str.find(tosearch) != string::npos) {
-			return true;
-		}
-		return false;
-	}
-
-	bool isSpaceBoth(char lhs, char rhs) {   // Checking if both given values are spaces
-		return (lhs == rhs) && (lhs == ' ');
 	}
 }; 

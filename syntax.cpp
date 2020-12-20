@@ -7,144 +7,217 @@
 
 using namespace std;
 
-// Class for Handling all the SYNTAX
-class SYNTAX: public SIDETASK {
+/*
+	This class handles all the Syntax
+	and file parsing
+*/
+
+class SYNTAX : public SIDETASK {
 private:
 	vector<string> lines;
 	STACK stack;                 // Our Custom Stack Interface
+	STACK stack2;                // Stack for handling the if structure
+
+	string current_word;         // Current Detected Word
+	int current_word_count;      // Detected Word Counter
 
 public:
-	SYNTAX(vector<string> _val) : lines(_val) {}   // Quick Pass
+	SYNTAX(vector<string> _val) {
+		lines = _val;
+		current_word = "";
+		current_word_count = 0;
+	} 
 
 	string clean(string _val) {
 		_val = this->rtrim(this->ltrim(_val));      // Trim Unnecessary Spaces
 		return _val;
 	}
 
-	bool hasBrackets(string line) {                         // Check if there are any brackets in the given line
-		return ((hasOpenBracket(line) || hasCloseBracket(line)) ? true : false);
-	}
-
-	bool hasKeywords(string line) {                        // Check if the given line has specified keywords
-		return ((hasOpenKeyword(line) || hasCloseKeyword(line)) ? true : false);
-	}
-
-	bool hasOpenBracket(string line) {
+	bool isOpenBracket(string line) {              // If given word is an open bracket
 		if (
-			exists(line, '[') ||
-			exists(line, '{') ||
-			exists(line, '(')
-			) {
-			return true;
-		}
-		return false;
-	}
-
-	bool hasCloseBracket(string line) {
-		if (
-			exists(line, ']') ||
-			exists(line, '}') ||
-			exists(line, ')')
-			) {
-			return true;
-		}
-		return false;
-	}
-
-	bool hasOpenKeyword(string line) {
-		if (
-			exists(line, "begin") || exists(line, "BEGIN") || exists(line, "Begin") ||
-			exists(line, "if") || exists(line, "IF") || exists(line, "if") ||
-			exists(line, "elseif") || exists(line, "ELSEIF") || exists(line, "Elseif") ||
-			exists(line, "else") || exists(line, "ELSE") || exists(line, "Else") ||
-			exists(line, "for") || exists(line, "FOR") || exists(line, "For") ||
-			exists(line, "while") || exists(line, "WHILE") || exists(line, "While")
+			line == "[" ||
+			line == "{" ||
+			line == "("
 		) {
 			return true;
 		}
 		return false;
 	}
 
-	bool hasCloseKeyword(string line) {
+	bool isCloseBracket(string line) {             // If given word is a close bracket
 		if (
-			exists(line, "end") || exists(line, "END") || exists(line, "End") ||
-			exists(line, "endif") || exists(line, "ENDIF") || exists(line, "Endif") ||
-			exists(line, "endfor") || exists(line, "ENDFOR") || exists(line, "Endfor") ||
-			exists(line, "endwhile") || exists(line, "ENDWHILE") || exists(line, "Endwhile")
+			line == "]" ||
+			line == "}" ||
+			line == ")"
 		) {
 			return true;
 		}
 		return false;
 	}
 
-	bool isCorrespondBracket(string open_bracket, string close_bracket) {
+	bool isOpenKeyword(string line) {              // If given word is an open Keyword
 		if (
-			(open_bracket == "[" && close_bracket == "]") ||
-			(open_bracket == "{" && close_bracket == "}") ||
-			(open_bracket == "(" && close_bracket == ")")
+			line == "begin" ||
+			line == "if" ||
+			line == "for" ||
+			line == "while"
 		) {
 			return true;
 		}
 		return false;
 	}
 
-	void engageBrackets(string line, int line_counter) {
-		string converter;
-		for (int i = 0; i < line.length(); i++) {
-			converter = line[i];
-			if (hasOpenBracket(converter)) {
-				stack.push(converter, line_counter);
-			}
-			else if (hasCloseBracket(converter)) {
-				if (stack.isEmpty()) {
-					halt(
-						"||  Line: " + to_string(line_counter) + " Brackets: ?" + converter + " Error: Unbalanced Brackets Detected"
-					);
-				}
-
-				NODE *open_bracket = stack.pop();
-
-				if (!(isCorrespondBracket(open_bracket->getData(), converter))) {
-					halt(
-						"||  Line: " + to_string(line_counter) + " Brackets: " + open_bracket->getData() + "//" + converter + " Error: Unbalanced Brackets Detected"
-					);
-				}
-			}
+	bool isCloseKeyword(string line) {             // If given word is a close Keyword
+		if (
+			line == "end" ||
+			line == "elseif" ||
+			line == "else" ||
+			line == "endif" ||
+			line == "endfor" ||
+			line == "endwhile"
+		) {
+			return true;
 		}
+		return false;
 	}
 
-	void engage() {
-		string line;
-		int line_counter;
-		vector<string>::iterator it = this->lines.begin();   // Creating an iterator for our vector
+	bool isCorrespond(string open, string close) {         // If given words are corresponding input and output
+		if (
+			(open == "begin" && close == "end") ||
+			(open == "if" && close == "endif") ||
+			(open == "for" && close == "endfor") ||
+			(open == "while" && close == "endwhile") ||
+			(open == "[" && close == "]") ||
+			(open == "{" && close == "}") ||
+			(open == "(" && close == ")")
+		) {
+			return true;
+		}
+		return false;
+	}
 
-		for (line_counter = 1; it != lines.end(); ++it, ++line_counter) {                  // Looping through lines
-			line = this->clean(*it);                         // Clean the Line
+	void validate(string line, int line_counter) {          // The method which validates the syntax by pushing to stack and checking the closing words
+		// Check for Begin Error
+		if (current_word_count == 0) {
+			if (line != "begin") {
+				halt(
+					line_counter, "BeginError", "Program doesn't start with Keyword 'begin'"
+				);
+			}
+		}
 
-			if (line_counter == 1) {                         // Check if Line Starts with BEGIN
-				if (!exists(line, "begin") && !exists(line, "BEGIN") && !exists(line, "Begin")) {
+		// Increment current Word and Counter
+		current_word = line;
+		current_word_count++;
+
+		// Push to stack if is an open word
+		if (isOpenKeyword(line) || isOpenBracket(line)) {
+			stack.push(line, line_counter);
+			if (line == "if") {
+				stack2.push(line, line_counter);
+			}
+		}
+		// Perform Operations is a close word
+		else if (isCloseKeyword(line) || isCloseBracket(line)) {
+			// Error is no opening found for the word
+			if (stack.isEmpty()) {
+				halt(
+					line_counter, "SyntaxError", "No Opening Found for " + line  
+				);
+			}
+			NODE* open;
+			// Operations when word is either elseif or else
+			if (line == "elseif" || line == "else") {
+				open = stack2.getTop();
+				if (!open) {
 					halt(
-						"||  Line: 1 Keyword: BEGIN Error: Program doesn't start with BEGIN Keyword"
+						line_counter, "SyntaxError", "No Opening Found for " + line + " detected"
 					);
 				}
-			}
-
-			if (this->hasBrackets(line)) {
-				this->engageBrackets(line, line_counter);
-			}
-			if (this->hasKeywords(line)) {
 				
+				if (open->getData() == line) {
+					halt(
+						line_counter, "MultipleElse", "Multiple Else Statements are detected"
+					);
+				}
+				else {
+					if (line == "else") {
+						stack2.push(line, line_counter);
+					}
+				}
 			}
+			// Check if Words are corresponding or not. 
+			else {
+				open = stack.pop();
+				if (open->getData() == "if") {
+					stack2.pop();
+				}
+				if (!(isCorrespond(open->getData(), line))) {
+					halt(
+						open->getLine(), line_counter, "SyntaxError", open->getData() + " || " + line, "Invalid Opening/Closing for the provided syntax. Check the Lines."
+					);
+				}
+			}
+		}
+	}
 
+	void looper(string line, int line_counter) {              // Loop through a given line and and seperate Words & Brackets
+		string converter = "";
+		for (int i = 0; i < line.length(); i++) {
+			if (!isalpha(line[i]) || i + 1 == line.length()) {
+
+				if (i + 1 == line.length()) {
+					if (isalpha(line[i])) {
+						converter += line[i];
+						validate(converter, line_counter);
+					}
+					else {
+						validate(converter, line_counter);
+						converter = line[i];
+						validate(converter, line_counter);
+					}
+				}
+				else {
+					validate(converter, line_counter);
+					converter = line[i];
+					validate(converter, line_counter);
+				}
+
+				converter = "";
+			}
+			else {
+				converter += line[i];
+			}
+		}
+	}
+
+	void parser() {
+		string line;
+		
+		// Loop through the vector and pass each line to the seperator function
+		vector<string>::iterator it1 = lines.begin();   
+		for (; it1 != lines.end(); ++it1) {
+			line = this->clean(*it1);
+			looper(line, (it1 - lines.begin()) + 1);
 		}
 
+		// At the End, check if the final word was "end"
+		if (it1 == lines.end()) {
+			if (current_word != "end") {
+				halt(
+					(it1 - lines.begin()) + 1, "EndError", "Program doesn't finish with 'end' Keyword"
+				);
+			}
+		}
+
+		// If Stack still is not empty, then it means an opening was left somewhere
 		if (!(stack.isEmpty())) {
-			NODE* unidentified = stack.pop();
+			NODE* open = stack.pop();
 			halt(
-				"||  Line: " + to_string(unidentified->getLine()) + " Brackets: " + unidentified->getData() + "? Error: Unbalanced Brackets detected"
+				open->getLine(), "SyntaxError", "No Closing was found for " + open->getData()
 			);
 		}
 
-		cout << "Congratulations! Your file has passed the test" << endl;
+		cout << "Congratulations! The Syntax of the provided File is Valid!" << endl;
 	}
 };

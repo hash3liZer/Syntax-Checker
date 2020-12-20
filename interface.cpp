@@ -4,6 +4,11 @@
 
 using namespace std;
 
+/*
+	Interface Class to manage tasks like printinng
+	and handle file tasks
+*/
+
 class INTERFACE {
 public:
 	void halt(string _val) {
