@@ -69,4 +69,4 @@ The code was compiled and tested on **Visual Studio Community Version 2019**. Ho
 </center>
 
 ## Contribution
-All code contribution are welcomed. <a href="//twitter.com/hash3liZer">@hash3liZer</a>
+All code contribution are welcomed.
