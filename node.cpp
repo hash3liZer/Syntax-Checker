@@ -11,14 +11,18 @@ using namespace std;
 
 class NODE {
 private:
-	int line_number;
-	string data;
-	NODE* next;
+	int line_number;              // Line number for each word
+	string data;                  // Word we are going to store here
+	NODE* next;                   // Pointer to next node
 
 public:
+	// Empty Constructor for default values
 	NODE() : line_number(0), data(""), next(NULL) {}
+
+	// Constructor to initialize with given values
 	NODE(int line, string data) : line_number(line), data(data), next(NULL) {}
 
+	// Setters
 	void setData(string data) {
 		data = data;
 	}
@@ -29,6 +33,7 @@ public:
 		next = ptr;
 	}
 
+	// Getters
 	int getLine() {
 		return line_number;
 	}
@@ -39,6 +44,6 @@ public:
 		return next;
 	}
 
+	// Our Friend Class Stack
 	friend class STACK;
-	friend class QUEUE;
 };

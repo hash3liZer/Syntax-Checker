@@ -10,21 +10,26 @@ private:
 	NODE* top;
 
 public:
+	// Constructor for Stack class
 	STACK() {
 		top = NULL;
 	}
 
+	// Setter
 	void setTop(NODE *ptr) {
 		top = ptr;
 	}
+	// Getter
 	NODE* getTop(){
 		return top;
 	}
 
+	// Checks if stack is empty
 	bool isEmpty() {
 		return (top == NULL ? true : false);
 	}
 
+	// Push a new value to Stack
 	void push(string data, int line) {
 		NODE* tmp = new NODE(line, data);
 		if (isEmpty()) {
@@ -36,6 +41,7 @@ public:
 		this->top = tmp;
 	}
 
+	// Pop a value from Stack
 	NODE* pop() {
 		if (isEmpty()) {
 			return NULL;
@@ -47,6 +53,8 @@ public:
 		}
 	}
 
+	// Display all valuess from Stack
+	// For debugging purposes.
 	void display() {
 		cout << "Stack: ";
 		NODE* tmp = top;
