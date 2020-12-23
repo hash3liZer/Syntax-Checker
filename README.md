@@ -30,7 +30,7 @@ Its a Semester Project built to correctly parse the `code` file and seperate key
 ## File Parsing
 One the main algorithms built in this project is correctly parsing all the lines given in the file. The code is given below. The following code will accept a string meaning, a line and the line number and separate each word found and the brackets and pass it to another function named `validate`. All this code is available in the syntax.cpp file. 
 
-```
+```c++
 void looper(string line, int line_counter) {
     string converter = "";
     for (int i = 0; i < line.length(); i++) {
